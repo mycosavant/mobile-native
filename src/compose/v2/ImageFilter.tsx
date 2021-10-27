@@ -361,6 +361,7 @@ export default function ImageFilter({
     //   // onImageChange(false);
     // }
     if (timeout.current) {
+      // @ts-ignore
       clearTimeout(timeout.current);
     }
     setShowingTitle(FILTERS[index].title);

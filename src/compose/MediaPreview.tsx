@@ -54,7 +54,7 @@ export default observer(function MediaPreview(props: PropsType) {
     videoHeight = Math.round(width / aspectRatio);
   }
 
-  const previewStyle = {
+  const previewStyle: any = {
     height: isImage ? undefined : videoHeight,
     // width: width,
     marginRight: 10,
@@ -109,6 +109,7 @@ export default observer(function MediaPreview(props: PropsType) {
           <MindsVideo
             entity={props.store.entity}
             video={props.store.mediaToConfirm}
+            // @ts-ignore
             containerStyle={previewStyle}
             resizeMode={ResizeMode.CONTAIN}
             autoplay

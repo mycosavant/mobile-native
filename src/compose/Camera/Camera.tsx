@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet, StatusBar, ScrollView, Image } from 'react-native';
 
@@ -31,7 +32,7 @@ import FocusGesture from './FocusGesture';
 import { MotiView } from 'moti';
 import useBestCameraAndFormat from './useBestCameraAndFormat';
 import useCameraStyle from './useCameraStyle';
-import { AppStackParamList } from '../../navigation/NavigationTypes';
+import { RootStackParamList } from '../../navigation/NavigationTypes';
 import { PermissionsContext } from '../PermissionsCheck';
 import Orientation from 'react-native-orientation-locker';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
@@ -41,7 +42,7 @@ import useIsPortrait from '~/common/hooks/useIsPortrait';
 import { useDimensions } from '@react-native-community/hooks';
 import FILTERS from '../v2/FiltersList';
 
-type CaptureScreenRouteProp = RouteProp<AppStackParamList, 'Capture'>;
+type CaptureScreenRouteProp = RouteProp<RootStackParamList, 'Capture'>;
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({

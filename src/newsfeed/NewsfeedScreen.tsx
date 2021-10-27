@@ -51,6 +51,7 @@ class NewsfeedScreen extends Component<PropsType> {
    * Nav to activity full screen
    */
   navToCapture = () => {
+    // @ts-ignore
     this.props.navigation.navigate('Capture', {});
   };
 
