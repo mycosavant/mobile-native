@@ -50,6 +50,8 @@ export default observer(function (props) {
       <TopBar
         leftText={i18n.t('visibility')}
         rightText={i18n.t('done')}
+        backIconName="chevron-left"
+        backIconSize="large"
         onPressRight={NavigationService.goBack}
         onPressBack={NavigationService.goBack}
         store={store}

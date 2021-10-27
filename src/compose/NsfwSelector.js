@@ -58,19 +58,21 @@ export default observer(function (props) {
         rightText={i18n.t('done')}
         onPressRight={NavigationService.goBack}
         onPressBack={NavigationService.goBack}
+        backIconName="chevron-left"
+        backIconSize="large"
         store={store}
       />
-      <MText
-        style={[
-          theme.paddingVertical3x,
-          theme.colorSecondaryText,
-          theme.fontL,
-          theme.paddingHorizontal3x,
-        ]}>
-        {i18n.t('nsfw.description1') + '\n\n' + i18n.t('nsfw.description2')}
-      </MText>
-
       <ScrollView style={styles.body}>
+        <MText
+          style={[
+            theme.paddingVertical3x,
+            theme.colorSecondaryText,
+            theme.fontL,
+            theme.paddingHorizontal3x,
+          ]}>
+          {i18n.t('nsfw.description1') + '\n\n' + i18n.t('nsfw.description2')}
+        </MText>
+
         <MText
           style={[
             theme.paddingVertical4x,

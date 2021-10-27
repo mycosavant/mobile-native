@@ -56,11 +56,14 @@ export default observer(function MediaPreview(props: PropsType) {
 
   const previewStyle = {
     height: videoHeight,
-    width: width,
+    // width: width,
+    marginRight: 10,
+    borderRadius: 10,
+    overflow: 'hidden',
   };
 
   return (
-    <>
+    <View style={previewStyle}>
       {props.store.attachment.uploading && (
         <Progress.Bar
           indeterminate={true}
@@ -73,7 +76,7 @@ export default observer(function MediaPreview(props: PropsType) {
         />
       )}
       {isImage ? (
-        <View>
+        <>
           {!props.store.isEdit && !props.store.portraitMode && (
             <TouchableOpacity
               testID="AttachmentDeleteButton"
@@ -89,9 +92,9 @@ export default observer(function MediaPreview(props: PropsType) {
             </TouchableOpacity>
           )}
           <ImagePreview image={props.store.mediaToConfirm} />
-        </View>
+        </>
       ) : (
-        <View style={previewStyle}>
+        <>
           {!props.store.isEdit && (
             <TouchableOpacity
               onPress={props.store.attachment.cancelOrDelete}
@@ -111,9 +114,9 @@ export default observer(function MediaPreview(props: PropsType) {
             autoplay
             onReadyForDisplay={onVideoLoaded}
           />
-        </View>
+        </>
       )}
-    </>
+    </View>
   );
 });
 

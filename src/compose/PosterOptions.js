@@ -29,6 +29,21 @@ import {
 import featuresService from '../common/services/features.service';
 import MText from '../common/components/MText';
 import BottomSheet from '~/common/components/bottom-sheet/BottomSheet';
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from '@react-navigation/stack';
+
+import TagSelector from '../compose/TagSelector';
+import AccessSelector from '../compose/AccessSelector';
+import NsfwSelector from '../compose/NsfwSelector';
+import ScheduleSelector from '../compose/ScheduleSelector';
+import PermawebSelector from '../compose/PermawebSelector';
+import MonetizeSelector from '../compose/MonetizeSelector';
+import MonetizeScreen from '../compose/monetize/MonetizeScreeen';
+import LicenseSelector from '../compose/LicenseSelector';
+import { useNavigation } from '@react-navigation/core';
+import Handle from '~/common/components/bottom-sheet/Handle';
 
 const Touchable = Platform.select({
   ios: RNTouchableOpacity,
@@ -37,40 +52,7 @@ const Touchable = Platform.select({
 
 const height = 83;
 
-/**
- * Header
- */
-const Header = props => (
-  <View
-    style={[styles.headerContainer, ThemedStyles.style.bcolorPrimaryBorder]}>
-    <View
-      style={[
-        styles.header,
-        ThemedStyles.style.bgSecondaryBackground,
-        ThemedStyles.style.bcolorPrimaryBorder,
-      ]}>
-      <MText
-        style={[
-          ThemedStyles.style.fontXL,
-          ThemedStyles.style.colorPrimaryText,
-          ThemedStyles.style.textCenter,
-          ThemedStyles.style.flexContainer,
-          ThemedStyles.style.bold,
-        ]}>
-        {i18n.t('capture.postOptions')}
-      </MText>
-      <MText
-        onPress={props.onPress}
-        style={[
-          ThemedStyles.style.fontL,
-          ThemedStyles.style.colorSecondaryText,
-          styles.close,
-        ]}>
-        {i18n.t('close')}
-      </MText>
-    </View>
-  </View>
-);
+const Stack = createStackNavigator();
 
 /**
  * Item
@@ -97,14 +79,135 @@ const Item = props => {
   );
 };
 
-export function useNavCallback(screen, store) {
+export function useNavCallback(screen, store, navigation) {
   return useCallback(() => {
-    NavigationService.navigate(screen, { store });
-  }, [store, screen]);
+    navigation.navigate(screen, { store });
+  }, [store, screen, navigation]);
 }
 
 const windowHeight = Dimensions.get('window').height;
 const snapPoints = [550];
+
+const PosterOptions = props => {
+  const theme = ThemedStyles.style;
+  const store = props.route.params.store;
+  // dereference observables to listen to his changes
+  const nsfw = store.nsfw.slice();
+  const tags = store.tags.slice();
+  const time_created = store.time_created;
+  const tokens = store.wire_threshold.min;
+  const license = store.attachment.license;
+  const hasAttachment = store.attachment.hasAttachment;
+  const accessId = store.accessId;
+
+  const onTagPress = useNavCallback('TagSelector', store, props.navigation);
+  const onNsfwPress = useNavCallback('NsfwSelector', store, props.navigation);
+  const onSchedulePress = useNavCallback(
+    'ScheduleSelector',
+    store,
+    props.navigation,
+  );
+  const onPermawebPress = useNavCallback(
+    'PermawebSelector',
+    store,
+    props.navigation,
+  );
+  const onMonetizePress = useNavCallback(
+    'MonetizeSelector',
+    store,
+    props.navigation,
+  );
+  const onLicensePress = useNavCallback(
+    'LicenseSelector',
+    store,
+    props.navigation,
+  );
+  const onPressVisibility = useNavCallback(
+    'AccessSelector',
+    store,
+    props.navigation,
+  );
+
+  const showSchedule =
+    (store.isEdit ? time_created > Date.now() : true) && !store.portraitMode;
+
+  const monetizeDesc = store.wire_threshold.support_tier?.urn
+    ? store.wire_threshold.support_tier?.name || 'Plus'
+    : '';
+
+  const showMonetize = !store.portraitMode && !store.isRemind;
+
+  const showPermaweb =
+    !store.isEdit &&
+    !store.group &&
+    !store.isRemind &&
+    featuresService.has('permaweb');
+
+  const permawebDesc = store.postToPermaweb
+    ? i18n.t('permaweb.description')
+    : null;
+
+  return (
+    <View
+      style={[
+        theme.flexContainer,
+        theme.bgPrimaryBackground,
+        theme.fullHeight,
+        // { elevation: 13 },
+      ]}>
+      <Item
+        title="Tag"
+        description={tags.slice(0, 4).map(t => `#${t} `)}
+        onPress={onTagPress}
+      />
+      <Item
+        title={i18n.t('nsfw.button')}
+        description={
+          nsfw.length !== 0 ? i18n.t('nsfw.notSafe') : i18n.t('nsfw.safe')
+        }
+        onPress={onNsfwPress}
+        testID="nsfwButton"
+      />
+      {showSchedule && (
+        <Item
+          title={i18n.t('capture.schedule')}
+          description={
+            time_created ? moment(time_created).calendar() : i18n.t('now')
+          }
+          onPress={onSchedulePress}
+        />
+      )}
+      {showMonetize && (
+        <Item
+          title={i18n.t('monetize.title')}
+          description={monetizeDesc}
+          onPress={onMonetizePress}
+          testID="monetizeButton"
+        />
+      )}
+      {showPermaweb && (
+        <Item
+          title={i18n.t('permaweb.title')}
+          description={permawebDesc}
+          onPress={onPermawebPress}
+          testID="permawebButton"
+        />
+      )}
+      <Item
+        title="License"
+        description={getLicenseText(license)}
+        onPress={onLicensePress}
+      />
+      {!store.group && (
+        <Item
+          title="Visibility"
+          description={getAccessText(accessId)}
+          onPress={onPressVisibility}
+        />
+      )}
+    </View>
+  );
+};
 
 /**
  * Options
@@ -112,128 +215,99 @@ const snapPoints = [550];
  */
 export default observer(
   forwardRef((props, ref) => {
-    const theme = ThemedStyles.style;
-    const store = props.store;
-    // dereference observables to listen to his changes
-    const nsfw = store.nsfw.slice();
-    const tags = store.tags.slice();
-    const time_created = store.time_created;
-    const tokens = store.wire_threshold.min;
-    const license = store.attachment.license;
-    const hasAttachment = store.attachment.hasAttachment;
-    const accessId = store.accessId;
-
-    const keyboard = useKeyboard();
+    // const keyboard = useKeyboard();
     const sheetRef = useRef();
+    const navigation = useNavigation();
+    // const onHeaderPress = useCallback(() => {
+    //   if (!sheetRef.current) return;
+    //   sheetRef.current.close();
+    // }, []);
 
-    const onTagPress = useNavCallback('TagSelector', store);
-    const onNsfwPress = useNavCallback('NsfwSelector', store);
-    const onSchedulePress = useNavCallback('ScheduleSelector', store);
-    const onPermawebPress = useNavCallback('PermawebSelector', store);
-    const onMonetizePress = useNavCallback('MonetizeSelector', store);
-    const onLicensePress = useNavCallback('LicenseSelector', store);
-    const onPressVisibility = useNavCallback('AccessSelector', store);
-
-    const onHeaderPress = useCallback(() => {
-      if (!sheetRef.current) return;
-      sheetRef.current.close();
-    }, []);
-
-    useEffect(() => {
-      if (keyboard.keyboardShown && sheetRef.current) {
-        sheetRef.current.close();
-      }
-    }, [keyboard.keyboardShown]);
+    // useEffect(() => {
+    //   if (keyboard.keyboardShown && sheetRef.current) {
+    //     sheetRef.current.close();
+    //   }
+    // }, [keyboard.keyboardShown]);
 
     useImperativeHandle(ref, () => ({
       show: () => {
         sheetRef.current.expand();
       },
+      navigateTo: screen => {
+        sheetRef.current.expand();
+        // setTimeout(() => {
+        navigation.navigate(screen, { store: props.store });
+        // }, 100)
+      },
     }));
-
-    const showSchedule =
-      (props.store.isEdit ? time_created > Date.now() : true) &&
-      !props.store.portraitMode;
-
-    const monetizeDesc = store.wire_threshold.support_tier?.urn
-      ? store.wire_threshold.support_tier?.name || 'Plus'
-      : '';
-
-    const showMonetize = !props.store.portraitMode && !props.store.isRemind;
-
-    const showPermaweb =
-      !store.isEdit &&
-      !store.group &&
-      !store.isRemind &&
-      featuresService.has('permaweb');
-
-    const permawebDesc = store.postToPermaweb
-      ? i18n.t('permaweb.description')
-      : null;
+    const screenOptions = React.useMemo(
+      () => ({
+        ...TransitionPresets.SlideFromRightIOS,
+        headerShown: false,
+        safeAreaInsets: { top: 0 },
+        // headerBackground: ThemedStyles.style.bgSecondaryBackground,
+        // cardStyle: ThemedStyles.style.bgDangerBackground,
+      }),
+      [],
+    );
 
     return (
       <BottomSheet
         ref={sheetRef}
-        topInset={StatusBar.currentHeight || 0}
-        snapPoints={snapPoints}
-        handleComponent={() => <Header onPress={onHeaderPress} />}>
-        <View
-          style={[
-            theme.bgSecondaryBackground,
-            theme.fullHeight,
-            { elevation: 13 },
-          ]}>
-          <Item
-            title="Tag"
-            description={tags.slice(0, 4).map(t => `#${t} `)}
-            onPress={onTagPress}
+        // topInset={StatusBar.currentHeight || 0}
+        // snapPoints={snapPoints}
+        handleComponent={() => (
+          <Handle style={ThemedStyles.style.bgPrimaryBackground} />
+        )}>
+        <Stack.Navigator screenOptions={screenOptions}>
+          <Stack.Screen
+            name="PosterOptions"
+            component={PosterOptions}
+            initialParams={{
+              ...props,
+            }}
+            // options={hideHeader}
           />
-          <Item
-            title={i18n.t('nsfw.button')}
-            description={
-              nsfw.length !== 0 ? i18n.t('nsfw.notSafe') : i18n.t('nsfw.safe')
+          <Stack.Screen
+            name="TagSelector"
+            component={TagSelector}
+            // options={hideHeader}
+          />
+          <Stack.Screen
+            name="NsfwSelector"
+            component={NsfwSelector}
+            // options={hideHeader}
+          />
+          <Stack.Screen
+            name="PermawebSelector"
+            component={PermawebSelector}
+            // options={hideHeader}
+          />
+          <Stack.Screen
+            name="ScheduleSelector"
+            component={ScheduleSelector}
+            // options={hideHeader}
+          />
+          <Stack.Screen
+            name="MonetizeSelector"
+            component={
+              featuresService.has('paywall-2020')
+                ? MonetizeScreen
+                : MonetizeSelector
             }
-            onPress={onNsfwPress}
-            testID="nsfwButton"
+            // options={hideHeader}
           />
-          {showSchedule && (
-            <Item
-              title={i18n.t('capture.schedule')}
-              description={
-                time_created ? moment(time_created).calendar() : i18n.t('now')
-              }
-              onPress={onSchedulePress}
-            />
-          )}
-          {showMonetize && (
-            <Item
-              title={i18n.t('monetize.title')}
-              description={monetizeDesc}
-              onPress={onMonetizePress}
-              testID="monetizeButton"
-            />
-          )}
-          {showPermaweb && (
-            <Item
-              title={i18n.t('permaweb.title')}
-              description={permawebDesc}
-              onPress={onPermawebPress}
-              testID="permawebButton"
-            />
-          )}
-          <Item
-            title="License"
-            description={getLicenseText(license)}
-            onPress={onLicensePress}
+          <Stack.Screen
+            name="LicenseSelector"
+            component={LicenseSelector}
+            // options={hideHeader}
           />
-          {!store.group && (
-            <Item
-              title="Visibility"
-              description={getAccessText(accessId)}
-              onPress={onPressVisibility}
-            />
-          )}
-        </View>
+          <Stack.Screen
+            name="AccessSelector"
+            component={AccessSelector}
+            // options={hideHeader}
+          />
+        </Stack.Navigator>
       </BottomSheet>
     );
   }),

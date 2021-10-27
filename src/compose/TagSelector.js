@@ -43,7 +43,7 @@ const TagRow = props => {
  */
 export default observer(function (props) {
   const theme = ThemedStyles.style;
-  const store = props.route.params.store;
+  const store = props.route?.params?.store;
   const inputRef = useRef(null);
 
   const localStore = useLocalStore(
@@ -102,6 +102,8 @@ export default observer(function (props) {
         rightText={i18n.t('done')}
         onPressRight={NavigationService.goBack}
         onPressBack={NavigationService.goBack}
+        backIconName="chevron-left"
+        backIconSize="large"
         store={store}
       />
       <MText
@@ -115,6 +117,7 @@ export default observer(function (props) {
       </MText>
       <View style={styles.suggestedContainer}>
         <ScrollView
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.suggestedScroll}
           horizontal={true}>
           <MIcon name="fire" size={23} style={theme.colorAlert} />

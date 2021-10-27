@@ -12,26 +12,34 @@ import { useDimensions } from '@react-native-community/hooks';
  * @param {Object} props
  */
 export default observer(function (props) {
-  const { width } = useDimensions().window;
+  let { width } = useDimensions().window;
+
+  width = width - 70;
+
   // calculate the aspect ratio
   let aspectRatio =
     props.image.pictureOrientation > 2 || !props.image.pictureOrientation
-      ? props.image.height / props.image.width
-      : props.image.width / props.image.height;
+      ? props.image.width / props.image.height
+      : props.image.height / props.image.width;
 
-  if (props.maxRatio && props.maxRatio < aspectRatio) {
-    aspectRatio = props.maxRatio;
-  }
+  // if (props.maxRatio && props.maxRatio < aspectRatio) {
+  //   aspectRatio = props.maxRatio;
+  // }
 
-  if (props.minRatio && props.minRatio > aspectRatio) {
-    aspectRatio = props.minRatio;
-  }
+  // if (props.minRatio && props.minRatio > aspectRatio) {
+  //   aspectRatio = props.minRatio;
+  // }
 
   let imageHeight = Math.round(width / aspectRatio);
 
+  // console.log('props.image', props.image);
+  // console.log('aspectRatio', aspectRatio);
+  // console.log('imageHeight', imageHeight);
+  // console.log('width', width);
   const imageStyle = {
     height: imageHeight,
     width: '100%',
+    borderRadius: 10,
   };
 
   // workaround: we use sourceURL for the preview on iOS because the image is not displayed with the uri
@@ -46,7 +54,7 @@ export default observer(function (props) {
         source={{ uri: uri + `?${props.image.key}` }} // we need to change the uri in order to force the reload of the image
         style={[
           imageStyle,
-          props.style,
+          // props.style,
           ThemedStyles.style.bgTertiaryBackground,
         ]}
         resizeMode={FastImage.resizeMode.contain}
@@ -65,7 +73,7 @@ export default observer(function (props) {
           style={[
             imageStyle,
             props.style,
-            ThemedStyles.style.bgTertiaryBackground,
+            // ThemedStyles.style.bgTertiaryBackground,
           ]}
           resizeMode={FastImage.resizeMode.contain}
         />

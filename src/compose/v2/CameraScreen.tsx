@@ -1,5 +1,5 @@
 // import { useFocusEffect } from '@react-navigation/native';
-import { useFocusEffect, useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/core';
 import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
@@ -93,7 +93,7 @@ export default observer(function (props) {
   const showCamera =
     mode === 'photo' || mode === 'video' || Boolean(mediaToConfirm);
 
-  useFocusEffect(() => {
+  useEffect(() => {
     changeNavigationBarColor('#000000', false, false);
 
     return () => {

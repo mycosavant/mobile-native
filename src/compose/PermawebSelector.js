@@ -23,6 +23,8 @@ export default observer(function (props) {
         rightText={i18n.t('done')}
         onPressRight={NavigationService.goBack}
         onPressBack={NavigationService.goBack}
+        backIconName="chevron-left"
+        backIconSize="large"
         store={store}
       />
       <MText style={[styles.permawebTerms]}>{i18n.t('permaweb.terms')}</MText>

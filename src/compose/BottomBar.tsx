@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Keyboard } from 'react-native';
 import { IconButton } from '~ui/icons';
 import ThemedStyles from '../styles/ThemedStyles';
 
@@ -33,7 +33,17 @@ export default function BottomBar(props) {
           name="camera"
           style={iconStyle}
           scale
-          onPress={() => props.store.setModePhoto(false)}
+          onPress={() => {
+            Keyboard.dismiss();
+            navigation.navigate('Capture', {
+              // store: props.store,
+              onMediaConfirmed: media => {
+                props.store.onMedia(media);
+                props.store.attachment.attachMedia(media, props.store.extra);
+                return true;
+              },
+            });
+          }}
         />
       )}
       {!props.store.isGroup() && (
@@ -41,8 +51,9 @@ export default function BottomBar(props) {
           name="money"
           style={iconStyle}
           scale
-          onPress={() =>
-            navigation.navigate('MonetizeSelector', { store: props.store })
+          onPress={
+            props.onMoney
+            // navigation.navigate('MonetizeSelector', { store: props.store })
           }
         />
       )}
@@ -50,8 +61,9 @@ export default function BottomBar(props) {
         name="hashtag"
         style={iconStyle}
         scale
-        onPress={() =>
-          navigation.navigate('TagSelector', { store: props.store })
+        onPress={
+          props.onHashtag
+          // navigation.navigate('TagSelector', { store: props.store })
         }
       />
       <View style={theme.flexContainer} />
