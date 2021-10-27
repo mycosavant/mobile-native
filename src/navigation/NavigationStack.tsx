@@ -10,8 +10,10 @@ import {
 } from '@react-navigation/drawer';
 import { Dimensions, Platform, StatusBar, View } from 'react-native';
 import {
+  CardStyleInterpolators,
   createStackNavigator,
   StackNavigationOptions,
+  TransitionSpecs,
 } from '@react-navigation/stack';
 import AnalyticsScreen from '../analytics/AnalyticsScreen';
 
@@ -38,7 +40,8 @@ import { DiscoverySearchScreen } from '../discovery/v2/search/DiscoverySearchScr
 import EmailConfirmationScreen from '../onboarding/EmailConfirmationScreen';
 import ThemedStyles from '../styles/ThemedStyles';
 import i18n from '../common/services/i18n.service';
-import ComposeScreen from '../compose/ComposeScreen';
+import ComposeScreen from '../compose/v2/ComposeScreen';
+import CameraScreen from '../compose/v2/CameraScreen';
 import TagSelector from '../compose/TagSelector';
 import AccessSelector from '../compose/AccessSelector';
 import NsfwSelector from '../compose/NsfwSelector';
@@ -136,13 +139,16 @@ const isIos = Platform.OS === 'ios';
 const hideHeader: NativeStackNavigationOptions = { headerShown: false };
 const captureOptions = {
   title: '',
-  animation: 'fade',
+  // animation: 'slide_from_bottom',
   headerShown: false,
+  // statusBarStyle: 'light',
+  // statusBarAnimation: 'fade',
 } as NativeStackNavigationOptions;
 
 const AppStackNav = createNativeStackNavigator<AppStackParamList>();
 const AuthStackNav = createStackNavigator<AuthStackParamList>();
 const RootStackNav = createStackNavigator<RootStackParamList>();
+const ComposeStackNav = createStackNavigator<any>();
 const InternalStackNav = createNativeStackNavigator<InternalStackParamList>();
 // const MainSwiper = createMaterialTopTabNavigator<MainSwiperParamList>();
 const DrawerNav = createDrawerNavigator<DrawerParamList>();
@@ -325,11 +331,11 @@ const AppStack = function () {
           options={{ title: i18n.t('messenger.legacyMessenger') }}
         />
         <AppStackNav.Screen
-          name="Capture"
+          name="Compose"
           component={ComposeScreen}
           options={captureOptions}
         />
-        <AppStackNav.Screen
+        {/* <AppStackNav.Screen
           name="TagSelector"
           component={TagSelector}
           options={hideHeader}
@@ -359,6 +365,16 @@ const AppStack = function () {
           options={hideHeader}
         />
         <AppStackNav.Screen
+          name="LicenseSelector"
+          component={LicenseSelector}
+          options={hideHeader}
+        />
+        <AppStackNav.Screen
+          name="AccessSelector"
+          component={AccessSelector}
+          options={hideHeader}
+        /> */}
+        <AppStackNav.Screen
           name="PlusMonetize"
           component={PlusMonetizeScreen}
           options={hideHeader}
@@ -371,16 +387,6 @@ const AppStack = function () {
         <AppStackNav.Screen
           name="CustomMonetize"
           component={CustomMonetizeScreen}
-          options={hideHeader}
-        />
-        <AppStackNav.Screen
-          name="LicenseSelector"
-          component={LicenseSelector}
-          options={hideHeader}
-        />
-        <AppStackNav.Screen
-          name="AccessSelector"
-          component={AccessSelector}
           options={hideHeader}
         />
         <AppStackNav.Screen
@@ -729,6 +735,20 @@ const RootStack = function (props) {
             options={{
               animationEnabled: false,
               cardStyle: ThemedStyles.style.bgPrimaryBackground, // avoid dark fade in android transition
+            }}
+          />
+
+          <ComposeStackNav.Screen
+            name="Capture"
+            component={CameraScreen}
+            options={{
+              cardStyleInterpolator:
+                CardStyleInterpolators.forRevealFromBottomAndroid,
+
+              // transitionSpec: {
+              //   open: TransitionSpecs.ScaleFromCenterAndroidSpec,
+              //   close: TransitionSpecs.ScaleFromCenterAndroidSpec,
+              // },
             }}
           />
           {/* Modal screens here */}
