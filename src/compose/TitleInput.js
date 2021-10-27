@@ -25,23 +25,28 @@ export default observer(function (props) {
 
   const theme = ThemedStyles.style;
   return (
-    <View style={theme.fullWidth}>
+    <View style={[theme.fullWidth, open ? {} : { alignItems: 'flex-end' }]}>
       <View
         style={[
           theme.fullWidth,
           theme.rowJustifyEnd,
+          // theme.rowJustifyStart,
           theme.alignCenter,
           theme.paddingRight,
-          theme.marginTop3x,
+          open ? {} : { width: 80 },
         ]}>
         <Icon
           name={open ? 'minus' : 'plus'}
-          size={20}
+          size={16}
           style={theme.colorTertiaryText}
           onPress={onPress}
         />
         <MText
-          style={[theme.fontXL, theme.colorIcon, theme.paddingHorizontal2x]}
+          style={[
+            theme.fontL,
+            theme.colorTertiaryText,
+            theme.paddingHorizontal2x,
+          ]}
           onPress={onPress}>
           Title
         </MText>
@@ -51,7 +56,7 @@ export default observer(function (props) {
           style={[
             theme.colorPrimaryText,
             theme.fontXXL,
-            theme.paddingHorizontal4x,
+            // theme.paddingHorizontal4x,
           ]}
           placeholder={i18nService.t('title')}
           placeholderTextColor={ThemedStyles.getColor('TertiaryText')}

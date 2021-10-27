@@ -15,11 +15,11 @@ export default observer(function (props) {
   const insets = useSafeArea();
   const menuStyle = [{ paddingTop: insets.top || 5 }, props.containerStyle];
 
-  const backIconName = props.backIconName || 'chevron-left';
-  const backIconSize = props.backIconSize || 45;
+  const backIconName = props.backIconName || 'close';
+  const backIconSize = props.backIconSize || 30;
 
   return (
-    <View style={[styles.topBar, menuStyle]}>
+    <View style={[styles.topBar, menuStyle, { paddingTop: 15 + insets.top }]}>
       <IconButton
         size={backIconSize}
         name={backIconName}
@@ -27,6 +27,7 @@ export default observer(function (props) {
         onPress={props.onPressBack}
         testID="topbarBack"
         spacingLeft="2x"
+        spacingRight="2x"
       />
       {props.leftText && (
         <MText style={styles.leftText}>{props.leftText}</MText>
@@ -58,14 +59,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 15,
   },
   leftText: {
     textAlign: 'left',
-    fontSize: 26,
+    fontSize: 20,
   },
   postButton: {
     textAlign: 'right',
-    fontSize: 20,
+    fontSize: 18,
     paddingRight: 20,
   },
 });

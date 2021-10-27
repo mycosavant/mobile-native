@@ -25,7 +25,7 @@ export default observer(function (props: PropsType) {
 
   const scale = mix(transition, 1, 0.4);
 
-  const internalSize = props.size - 10;
+  const internalSize = props.size - 5;
 
   const borderRadiusInternal = mix(transition, internalSize / 2, 10);
 
@@ -33,20 +33,20 @@ export default observer(function (props: PropsType) {
     width: props.size,
     height: props.size,
     borderRadius: props.size / 2,
-    borderWidth: 5,
-    borderColor: 'white',
+    // borderWidth: 4,
+    // borderColor: 'white',
   };
 
   const innerStyle = {
     transform: [{ scale }],
-    backgroundColor: props.isPhoto ? '#868686' : '#E03C20',
+    backgroundColor: props.isPhoto ? '#fff' : '#E03C20',
     borderRadius: borderRadiusInternal,
     width: internalSize,
     height: internalSize,
   };
 
   return (
-    <View style={styles.circleWrapper}>
+    <View style={[styles.circleWrapper, styles.circle]}>
       {props.pulse && <Pulse size={props.size} />}
       <TouchableOpacity
         onPress={props.onPress}
@@ -65,7 +65,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  // circleBorder: {},
   circle: {
-    borderWidth: 4 * StyleSheet.hairlineWidth,
+    // borderWidth: 4 * StyleSheet.hairlineWidth,
+
+    borderWidth: 3,
+    borderColor: 'white',
+    borderRadius: 100,
   },
 });
