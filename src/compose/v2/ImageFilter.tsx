@@ -152,33 +152,43 @@ export default function ImageFilter({
     // bottom: 0,
   };
 
-  const extractedUris = useRef({});
+  const [extractedUris, setExtractedUris] = useState({});
   const Filters = useMemo(() => {
-    return FILTERS.map(({ filterComponent: FilterComponent }, index) => {
-      // console.log('activeIndex', activeIndex);
-      // console.log('index === activeIndex', index === activeIndex);
-
+    return FILTERS.map(({ filterComponent: FilterComponent, title }, index) => {
       return (
         <FilterComponent
-          // extractImageEnabled={true}
-          // extractImageEnabled={true}
-          // onExtractImage={() => onExtractImage(index)}
           onExtractImage={({ nativeEvent }) => {
-            console.log('nativeEvent.uri', nativeEvent.uri);
-            extractedUris.current[index] = nativeEvent.uri;
+            setExtractedUris({
+              ...extractedUris,
+              [index]: nativeEvent.uri,
+            });
           }}
-          extractImageEnabled={index === activeIndex}
+          extractImageEnabled={Math.abs(activeIndex - index) <= 2} // two on each side
           image={createImg(image, imageStyle)}
         />
       );
     });
-  }, [activeIndex]);
+  }, [activeIndex, extractedUris]);
 
   // const generateFilters = () => {
   //   return (
 
   //   );
   // };
+
+  useEffect(() => {
+    if (activeIndex === 0) {
+      onImageChange(image);
+    }
+    if (extractedUris[activeIndex]) {
+      onImageChange({
+        ...image,
+        type: image.type,
+        uri: extractedUris[activeIndex],
+        path: extractedUris[activeIndex],
+      });
+    }
+  }, [activeIndex, extractedUris]);
 
   // useEffect(() => {
   //   // const filterComponents = [];
@@ -319,9 +329,51 @@ export default function ImageFilter({
     return () => cleanExtractedImagesCache();
   }, []);
 
+  const onScroll = useCallback(event => {
+    cancelAnimation(offset);
+    offset.value = event.nativeEvent.contentOffset.x;
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    setActiveIndex(index);
+
+    // don't apply Normal filter
+    // console.log('extractedUris.current', extractedUris.current);
+    // console.log(
+    //   'extractedUris.current[index]',
+    //   extractedUris.current[index],
+    // );
+
+    // if (index > 0 && extractedUris.current[index]) {
+    //   onImageChange({
+    //     ...image,
+    //     type: image.type,
+    //     uri: extractedUris.current[index],
+    //     path: extractedUris.current[index],
+    //   });
+    // }
+
+    // if (index === 0) {
+    //   console.log('SAME');
+    //   onImageChange(image);
+    // }
+
+    // if (!extractedUris.current[index]) {
+    //   console.log('WE DONT HAVE');
+    //   // onImageChange(false);
+    // }
+    if (timeout.current) {
+      clearTimeout(timeout.current);
+    }
+    setShowingTitle(FILTERS[index].title);
+
+    setTimeout(() => {
+      setShowingTitle('');
+    }, 2000);
+  }, []);
+
   const timeout = useRef();
 
   // console.log('IMAGEFILTER RENDER ===>');
+  // console.log(`Structure ${JSON.stringify(extractedUris, null, 2)}`);
 
   return (
     <View style={[ThemedStyles.style.flexContainer]}>
@@ -330,48 +382,7 @@ export default function ImageFilter({
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={useCallback(
-          event => {
-            cancelAnimation(offset);
-            offset.value = event.nativeEvent.contentOffset.x;
-
-            const index = Math.round(event.nativeEvent.contentOffset.x / width);
-
-            setActiveIndex(index);
-
-            // don't apply Normal filter
-            // console.log('extractedUris.current', extractedUris.current);
-            console.log(
-              'extractedUris.current[index]',
-              extractedUris.current[index],
-            );
-
-            if (index > 0 && extractedUris.current[index]) {
-              console.log('WE HAVE');
-
-              onImageChange({
-                ...image,
-                type: image.type,
-                uri: extractedUris.current[index],
-                path: extractedUris.current[index],
-              });
-            }
-
-            if (index === 0) {
-              // onImageChange(image);
-            }
-
-            if (timeout.current) {
-              clearTimeout(timeout.current);
-            }
-            setShowingTitle(FILTERS[index].title);
-
-            setTimeout(() => {
-              setShowingTitle('');
-            }, 2000);
-          },
-          [extractedUris],
-        )}>
+        onScroll={onScroll}>
         {useMemo(
           () => new Array(filtersToLoad).fill(null).map(() => createVw(width)),
           [filtersToLoad, width],

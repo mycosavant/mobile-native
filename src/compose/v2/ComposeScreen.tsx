@@ -15,7 +15,7 @@ import MetaPreview from '../MetaPreview';
 import TitleInput from '../TitleInput';
 import NavigationService from '../../navigation/NavigationService';
 import RemindPreview from '../RemindPreview';
-import PosterOptions from '../PosterOptions2';
+import PosterOptions from '../PosterOptions';
 import TopBar from '../TopBar';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomBar from '../BottomBar';
@@ -256,14 +256,10 @@ export default observer(function (props) {
           <BottomBar
             store={store}
             onHashtag={() => {
-              console.log('onHashtag');
-
-              // navigation.navigate('MonetizeSelector', { store: props.store })
-              optionsRef.current.navigateTo('MonetizeSelector');
+              optionsRef.current.navigateTo('TagSelector');
             }}
             onMoney={() => {
-              // navigation.navigate('TagSelector', { store: props.store })
-              optionsRef.current.navigateTo('TagSelector');
+              optionsRef.current.navigateTo('MonetizeSelector');
             }}
             onOptions={() => {
               Keyboard.dismiss();

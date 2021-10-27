@@ -55,7 +55,7 @@ export default observer(function MediaPreview(props: PropsType) {
   }
 
   const previewStyle = {
-    height: videoHeight,
+    height: isImage ? undefined : videoHeight,
     // width: width,
     marginRight: 10,
     borderRadius: 10,

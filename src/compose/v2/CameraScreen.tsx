@@ -157,6 +157,7 @@ export default observer(function (props) {
       )}
       {Boolean(mediaToConfirm) && (
         <BottomBarMediaConfirm
+          mode={mode}
           onRetake={() => {
             setMediaToConfirm(null);
           }}
@@ -219,7 +220,7 @@ const BottomBar = ({ mode, onSetPhotoPress, onSetVideoPress }) => {
   );
 };
 
-const BottomBarMediaConfirm = ({ onRetake, onConfirm }) => {
+const BottomBarMediaConfirm = ({ mode, onRetake, onConfirm }) => {
   const theme = ThemedStyles.style;
   const insets = useSafeArea();
   const tabStyle = {
@@ -251,7 +252,7 @@ const BottomBarMediaConfirm = ({ onRetake, onConfirm }) => {
 
         <Button
           onPress={onConfirm}
-          text={'Use this'}
+          text={'Use ' + mode}
           // borderRadius={3}
           // backgroundColor="transparent"
           small
