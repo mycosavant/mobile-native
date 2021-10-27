@@ -7,7 +7,7 @@ import React, {
 import { FlatList } from 'react-native-gesture-handler';
 import { PlaceholderMedia, Fade, Placeholder } from 'rn-placeholder';
 import { observer } from 'mobx-react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import ThemedStyles from '../styles/ThemedStyles';
 import PortraitContentBarItem from './PortraitContentBarItem';
@@ -15,24 +15,27 @@ import { PortraitBarItem } from './createPortraitStore';
 import { useNavigation } from '@react-navigation/native';
 import { useStores } from '../common/hooks/use-stores';
 import MText from '../common/components/MText';
+import sessionService from '~/common/services/session.service';
 
 /**
  * Header component
  */
 const Header = () => {
-  const theme = ThemedStyles.style;
   const navigation = useNavigation<any>();
+  const user = sessionService.getUser();
+
   const nav = useCallback(
     () => navigation.push('Capture', { portrait: true }),
     [navigation],
   );
 
   return (
-    <TouchableOpacity
+    <PortraitContentBarItem
+      avatarUrl={user.getAvatarSource()}
+      withPlus
       onPress={nav}
-      style={[styles.add, theme.bgTertiaryBackground, theme.centered]}>
-      <MText style={[theme.fontXXL, theme.colorSecondaryText]}>+</MText>
-    </TouchableOpacity>
+      title={'New Story'}
+    />
   );
 };
 
@@ -58,8 +61,21 @@ const BarPlaceholder = () => {
   );
 };
 
-const renderItem = (row: { item: PortraitBarItem; index: number }) => {
-  return <PortraitContentBarItem item={row.item} index={row.index} />;
+const renderItem = ({
+  item,
+  index,
+}: {
+  item: PortraitBarItem;
+  index: number;
+}) => {
+  return (
+    <PortraitContentBarItem
+      avatarUrl={item.user.getAvatarSource()}
+      title={item.user.username}
+      unseen={item.unseen}
+      index={index}
+    />
+  );
 };
 
 /**

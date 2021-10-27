@@ -5,14 +5,18 @@ import FastImage from 'react-native-fast-image';
 
 import ThemedStyles from '../styles/ThemedStyles';
 import excerpt from '../common/helpers/excerpt';
-import type { PortraitBarItem } from './createPortraitStore';
 import PressableScale from '../common/components/PressableScale';
 import navigationService from '../navigation/NavigationService';
 import MText from '../common/components/MText';
+import { Icon } from '~/common/ui/icons';
 
 type PropsType = {
-  item: PortraitBarItem;
-  index: number;
+  avatarUrl?: any;
+  unseen?: boolean;
+  title: string;
+  index?: number;
+  onPress?: any;
+  withPlus?: boolean;
 };
 
 /**
@@ -28,19 +32,33 @@ export default observer(function PortraitContentBarItem(props: PropsType) {
 
   return (
     <View style={containerStyle}>
-      <PressableScale onPress={onPress} activeOpacity={0.5}>
-        <FastImage
-          source={props.item.user.getAvatarSource()}
-          style={styles.avatar}
-        />
-        {props.item.unseen ? <View style={styles.unseen} /> : null}
+      <PressableScale
+        onPress={props.index ? onPress : props.onPress}
+        activeOpacity={0.5}>
+        <FastImage source={props.avatarUrl} style={styles.avatar} />
+        {props.unseen ? <View style={styles.unseen} /> : null}
+        {props.withPlus && (
+          <Icon
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              backgroundColor: '#fff',
+              borderRadius: 100,
+              // padding: -5,
+              // margin: -4,
+            }}
+            name="plus-circle"
+            color="Link"
+          />
+        )}
       </PressableScale>
-      <MText style={textStyle}>{excerpt(props.item.user.username, 10)}</MText>
+      <MText style={textStyle}>{excerpt(props.title, 10)}</MText>
     </View>
   );
 });
 
-const styles = StyleSheet.create({
+const styles = ThemedStyles.create({
   container: {
     padding: 10,
     overflow: 'visible',
@@ -59,11 +77,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderColor: '#ECDA51',
   },
-  avatar: {
-    height: 55,
-    width: 55,
-    borderRadius: 27.5,
-  },
+  avatar: [
+    'bgTertiaryBackground',
+    {
+      height: 55,
+      width: 55,
+      borderRadius: 27.5,
+    },
+  ],
 });
 
 const textStyle = ThemedStyles.combine(
